@@ -49,6 +49,8 @@ fetch(dataURL)
       addEventListeners();
       updateQuantities();
       updatePrice();
+      orderInput();
+      initOrderItems(cart);
     }
   })
   .catch((error) => console.log(error))
@@ -75,7 +77,7 @@ function buildCartItems(dataArray) {
           <div class="cart__item__content__description">
             <h2>${dataArray[i].name}</h2>
             <p>${dataArray[i].color}</p>
-            <p>${priceObj[dataArray[i].id]/100}</p>
+            <p>${priceObj[dataArray[i]._id]/100}</p>
           </div>
           <div class="cart__item__content__settings">
             <div class="cart__item__content__settings__quantity">
@@ -89,7 +91,7 @@ function buildCartItems(dataArray) {
         </div>
       </article>
     `
-    console.log(cart[i].qty)
+    // console.log(priceObj[dataArray[i]._id]);
     const cartItemList = document.getElementById('cart__items');
     cartItemList.insertAdjacentHTML('afterbegin', item);
 
@@ -99,12 +101,18 @@ function buildCartItems(dataArray) {
 }
 
 // adding listeners function
-function addEventListeners(dataArray) {
-  const deleteBtn = document.getElementsByClassName('deleteItem')[0];
-  deleteBtn.addEventListener('click', deleteFunction);
-
-  const qtyBtn = document.getElementsByClassName('itemQuantity')[0];
-  qtyBtn.addEventListener('change', handleQtyBtn);
+function addEventListeners() {
+  const deleteBtn = document.getElementsByClassName('deleteItem');
+  for(let i=0; i<deleteBtn.length; i++) {
+    deleteBtn[i].addEventListener('click', deleteFunction);
+  }
+  
+  const qtyBtn = document.getElementsByClassName('itemQuantity');
+  console.log(qtyBtn);
+  for(let i=0; i<qtyBtn.length; i++) {
+    qtyBtn[i].addEventListener('change', handleQtyBtn);
+  }
+  
 
   // const total = document.getElementById('totalQuantity');
   // total.addEventListener('load', updateQuantities);
@@ -123,7 +131,7 @@ function deleteFunction(e) {
   const cartItem = e.target.parentElement.parentElement.parentElement.parentElement;
   // console.log(cartItem);
   console.log('in the delete function');
-  const dataId = cartItem.dataset._id;
+  const dataId = cartItem.dataset.id;
   const dataColor = cartItem.dataset.color;
 
   for(let i = 0; i < cart.length; i++){ 
@@ -133,61 +141,82 @@ function deleteFunction(e) {
     }
 }
   syncCart();
-
+  updateQuantities();
+  updatePrice();
   cartItem.remove();
 }
 
 function handleQtyBtn (data) {
   const input = data.target;
   const value = input.value;
-  console.log(value);
-  for (i=0; i<cart; i++) {
-    cart[i].qty = value;
+  const cartItem = input.parentElement.parentElement.parentElement.parentElement;
+  const dataId = cartItem.dataset.id;
+  const dataColor = cartItem.dataset.color;
+  console.log(dataId);
+  console.log(dataColor);
+  console.log(cartItem);
+  for (let i=0; i<cart.length; i++) {
+    if (cart[i]._id === dataId &&
+      cart[i].color === dataColor) {
+        cart[i].qty = value;
+        console.log('made it');
+      }
+    
     console.log(cart[i].qty);
-  }
   
+  }
+  // console.log(cart.qty);
+
   console.log('qty btn touched');
   // cart.qty = value;
-  console.log(cart);
+  // console.log(cart);
   syncCart();
   updateQuantities();
+  updatePrice();
 }
 
 function updateQuantities(dataArray) {
   let total = document.getElementById('totalQuantity');
-  total.innerText = 0;
+  // total.innerText = 0;
   // console.log(total);
-
-  for (i = 0; i < cart.length; i++) {
-   totalQty = parseInt(cart[i].qty, 10);
-   total.innerText = totalQty;
-   console.log(totalQty);
+  totalQty = 0;
+  for (let i = 0; i < cart.length; i++) {
+    totalQty += parseInt(cart[i].qty, 10);
+  //  total.innerText = totalQty;
+  //  console.log(totalQty);
   };
+  total.innerHTML = totalQty;
   // console.log(total);
-}
+};
 
 /* <div class="cart__price">
       <p>Total (<span id="totalQuantity"><!-- 2 --></span> articles) : €<span id="totalPrice"><!-- 84.00 --></span></p>
     </div> */
 
 function updatePrice(dataArray) {
-  let totalPrice = document.getElementById('totalPrice');
+  let totals = document.getElementById('totalPrice');
   totalPrice = 0;
-  for(i=0; i<cart.length; i++) {
-    totalPrice = totalPrice + (cart[i].qty * cart[i].price);
-  }
-  return totalPrice;
+  equal = 0;
+  // console.log(cart.qty);
+  for(let i=0; i<cart.length; i++) {
+    totalPrice += parseInt(cart[i].qty, 10) * priceObj[cart[i]._id]/100;
+    // console.log(priceObj[cart[i]._id]/100);
+    // console.log(equal += parseInt(cart[i].qty, 10));
+  };
+  totals.innerHTML = totalPrice;
+  // console.log(totals);
+  // return totalPrice;
 
   // totalPrice.innerText = 0.00;
-}
+};
 
 // 1st
 function initializePriceObj(dataArray) {
   
-  for(let i = 0; i<dataArray.length; i++) {
+  for(let i = 0; i<cart.length; i++) {
     // id of product = value of product
-    priceObj[dataArray[i]._id] = dataArray[i].price;
-    // console.log(priceObj[dataArray[i]._id]);
+    priceObj[cart[i]._id] = dataArray[i].price;
+    // console.log(priceObj[cart[i]._id]/100);
     // console.log(priceObj[dataArray[i].id]);
   }
   syncCart();
@@ -197,4 +226,82 @@ function initializePriceObj(dataArray) {
 function syncCart () {
   localStorage.setItem('cart', JSON.stringify(cart));
   cart = JSON.parse(localStorage.getItem('cart'));
+}
+
+const order = {
+  contact: {
+   firstName: '',
+   lastName: '',
+   address: '',
+   city: '',
+   email: ''
+ },
+ products: []
+}
+
+// fetch(order, {
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+//   body: JSON.stringify(order),
+// })
+//   .then((response) => response.json())
+//   .then((data) => {
+//     console.log('Success:', data);
+//   })
+//   .catch((error) => {
+//     console.error('Error:', error);
+//   });
+
+function initOrderItems (cart) {
+  order.contact.firstName = firstName;
+  order.contact.lastName = lastName;
+  order.contact.address = address;
+  order.contact.city = city; 
+  order.contact.email = email;
+  
+  for (let i=0; i<cart.length; i++) {
+    order.products.push(cart._id);
+    console.log(order);
+  }
+}
+
+function orderInput () {
+  const firstName = document.getElementById('firstName');
+  firstName.addEventListener('click', handleFirstName());
+  // console.log(firstName.value);
+
+  const lastName = document.getElementById('lastName');
+  lastName.addEventListener('input', handleLastName());
+
+  const address = document.getElementById('address');
+  address.addEventListener('input', handleAddress());
+
+  const city = document.getElementById('city');
+  city.addEventListener('input', handleCity());
+
+  const email = document.getElementById('email');
+  email.addEventListener('input', handleEmail());
+}
+
+function handleFirstName(e) {
+  const value = firstName.value;
+
+}
+
+function handleLastName(e) {
+
+}
+
+function handleAddress(e) {
+
+}
+
+function handleCity(e) {
+
+}
+
+function handleEmail(e) {
+
 }
