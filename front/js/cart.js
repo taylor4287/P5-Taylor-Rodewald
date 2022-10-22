@@ -46,6 +46,7 @@ fetch(dataURL)
   // adding the listeners
   .then(() => {
     if (cart.length !== 0) {
+      console.log('cart has stuff in it');
       addEventListeners();
       updateQuantities();
       updatePrice();
@@ -239,6 +240,14 @@ const order = {
  products: []
 }
 
+
+
+// cart.post('/api', (requst, response) => {
+//   console.log(request);
+// });
+
+// fetch('/api', options);
+
 // fetch(order, {
 //   method: 'POST',
 //   headers: {
@@ -255,53 +264,176 @@ const order = {
 //   });
 
 function initOrderItems (cart) {
-  order.contact.firstName = firstName;
+  // order.contact.firstName = firstName;
   order.contact.lastName = lastName;
   order.contact.address = address;
   order.contact.city = city; 
   order.contact.email = email;
   
   for (let i=0; i<cart.length; i++) {
-    order.products.push(cart._id);
+    order.products.push(cart[i]._id);
+    
     console.log(order);
   }
 }
 
 function orderInput () {
   const firstName = document.getElementById('firstName');
-  firstName.addEventListener('click', handleFirstName());
+  firstName.addEventListener('input', handleFirstName);
   // console.log(firstName.value);
 
   const lastName = document.getElementById('lastName');
-  lastName.addEventListener('input', handleLastName());
+  lastName.addEventListener('input', handleLastName);
 
   const address = document.getElementById('address');
-  address.addEventListener('input', handleAddress());
+  address.addEventListener('input', handleAddress);
 
   const city = document.getElementById('city');
-  city.addEventListener('input', handleCity());
+  city.addEventListener('input', handleCity);
 
   const email = document.getElementById('email');
-  email.addEventListener('input', handleEmail());
-}
+  email.addEventListener('input', handleEmail);
+
+  const order = document.getElementById('order');
+  order.addEventListener('click', submitOrder);
+};
+
+
 
 function handleFirstName(e) {
-  const value = firstName.value;
+  const firstName = document.getElementById('firstName');
 
-}
+  order.contact.firstName = firstName.value;
+  // checkFirstName();
+};
 
 function handleLastName(e) {
+  const lastName = document.getElementById('lastName');
 
-}
+  order.contact.lastName = lastName.value;
+  // checklastName();
+};
 
 function handleAddress(e) {
+  const address = document.getElementById('address');
 
-}
+  order.contact.address = address.value;
+};
 
 function handleCity(e) {
+  const city = document.getElementById('city');
 
-}
+  order.contact.city = city.value;
+  // checkCity();
+};
 
 function handleEmail(e) {
+  const email = document.getElementById('email');
 
+  order.contact.email = email.value;
+};
+
+// form data 
+// regular expressions for validation
+let emailRegExp = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i; 
+let charAlphaRegExp = /^[A-Za-z -]{3,32}$/;
+let addressRegExp = /^[A-Za-z0-9 ]{7,32}$/; 
+
+//getting access to form data in the DOM
+let form = document.querySelector('.cart__order__form');
+let firstName = document.getElementById('firstName');
+let lastName = document.getElementById('lastName');
+let address = document.getElementById('address');
+let city = document.getElementById('city');
+let email = document.getElementById('email');
+
+let validFirstName = false;
+let validLastName = false;
+let validAddress = false;
+let validCity = false;
+let validEmail = false;
+
+function checkFirstName() {
+  if (charAlphaRegExp.test(firstName.value)) {
+    firstNameErrorMag.innerHTML = null;
+    firstName.style.border = '2px solid green';
+    validFirstName = true;
+  } else if (charAlphaRegExp.test(firstName.value) === false||firstName.value === '') {
+    firstNameErrorMsg.innerHTML = 'Please enter a valid first name';
+    firstName.style.border = '2px solid red';
+    validFirstName = false;
+  }
+};
+
+function checkLastName() {
+  if (charAlphaRegExp.test(lastName.value)) {
+    lastNameErrorMag.innerHTML = null;
+    lastName.style.border = '2px solid green';
+    validLastName = true;
+  } else if (charAlphaRegExp.test(lastName.value) === false||lastName.value === '') {
+    lastNameErrorMsg.innerHTML = 'Please enter a valid last name';
+    lastName.style.border = '2px solid red';
+    validLastName = false;
+  }
+};
+
+function checkAddress() {
+  if (addressRegExp.test(address.value)) {
+    addressErrorMag.innerHTML = null;
+    address.style.border = '2px solid green';
+    validAddress = true;
+  } else if (addressRegExp.test(address.value) === false||address.value === '') {
+    addressErrorMsg.innerHTML = 'Please enter a valid address';
+    address.style.border = '2px solid red';
+    validAddress = false;
+  }
+};
+
+function checkCity() {
+  if (charAlphaRegExp.test(city.value)) {
+    cityErrorMag.innerHTML = null;
+    city.style.border = '2px solid green';
+    validCity = true;
+  } else if (charAlphaRegExp.test(city.value) === false||city.value === '') {
+    cityErrorMsg.innerHTML = 'Please enter a valid city';
+    city.style.border = '2px solid red';
+    validCity = false;
+  }
+};
+
+function checkEmail() {
+  if (charAlphaRegExp.test(email.value)) {
+    emailErrorMag.innerHTML = null;
+    email.style.border = '2px solid green';
+    validEmail = true;
+  } else if (charAlphaRegExp.test(email.value) === false||email.value === '') {
+    emailErrorMsg.innerHTML = 'Please enter a valid email';
+    email.style.border = '2px solid red';
+    validEmail = false;
+  }
+};
+
+function submitOrder(e) {
+  e.preventDefault();
+  // console.log('im here');
+  fetch('http://localhost:3000/api/products/order', {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(order)
+  }) .then(function (response) {
+    return response.json();
+  }).then(function (data) {
+    console.log(data);
+    pageRedirect(data);
+  }).catch(function (error) {
+    console.log(error);
+  })
+};
+console.log(order);
+function pageRedirect(data) {
+  const newPage = './confirmation.html?id=' + data.orderId;
+
+  window.location.href = newPage;
 }

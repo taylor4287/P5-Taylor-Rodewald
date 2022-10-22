@@ -43,7 +43,7 @@ function makeCard(dataObj) {
   card.setAttribute("href", cardLink);
   image.setAttribute('src',dataObj.imageUrl);
   image.setAttribute('alt',dataObj.altTxt);
-
+  console.log(cardLink);
 // add classes to elements
   name.classList.add('productName');
   description.classList.add('productDescription');
