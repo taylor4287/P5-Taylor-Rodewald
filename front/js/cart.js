@@ -304,36 +304,38 @@ function handleFirstName(e) {
   const firstName = document.getElementById('firstName');
 
   order.contact.firstName = firstName.value;
-  // checkFirstName();
+  checkFirstName();
 };
 
 function handleLastName(e) {
   const lastName = document.getElementById('lastName');
 
   order.contact.lastName = lastName.value;
-  // checklastName();
+  checkLastName();
 };
 
 function handleAddress(e) {
   const address = document.getElementById('address');
 
   order.contact.address = address.value;
+  checkAddress();
 };
 
 function handleCity(e) {
   const city = document.getElementById('city');
 
   order.contact.city = city.value;
-  // checkCity();
+  checkCity();
 };
 
 function handleEmail(e) {
   const email = document.getElementById('email');
 
   order.contact.email = email.value;
+  checkEmail();
 };
 
-// form data 
+``// form data 
 // regular expressions for validation
 let emailRegExp = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i; 
 let charAlphaRegExp = /^[A-Za-z -]{3,32}$/;
@@ -341,11 +343,11 @@ let addressRegExp = /^[A-Za-z0-9 ]{7,32}$/;
 
 //getting access to form data in the DOM
 let form = document.querySelector('.cart__order__form');
-let firstName = document.getElementById('firstName');
-let lastName = document.getElementById('lastName');
-let address = document.getElementById('address');
-let city = document.getElementById('city');
-let email = document.getElementById('email');
+let firstNameErrorMsg = document.getElementById('firstNameErrorMsg');
+let lastNameErrorMsg = document.getElementById('lastNameErrorMsg');
+let addressErrorMsg = document.getElementById('addressErrorMsg');
+let cityErrorMsg = document.getElementById('cityErrorMsg');
+let emailErrorMsg = document.getElementById('emailErrorMsg');
 
 let validFirstName = false;
 let validLastName = false;
@@ -355,7 +357,7 @@ let validEmail = false;
 
 function checkFirstName() {
   if (charAlphaRegExp.test(firstName.value)) {
-    firstNameErrorMag.innerHTML = null;
+    firstNameErrorMsg.innerHTML = null;
     firstName.style.border = '2px solid green';
     validFirstName = true;
   } else if (charAlphaRegExp.test(firstName.value) === false||firstName.value === '') {
@@ -367,7 +369,7 @@ function checkFirstName() {
 
 function checkLastName() {
   if (charAlphaRegExp.test(lastName.value)) {
-    lastNameErrorMag.innerHTML = null;
+    lastNameErrorMsg.innerHTML = null;
     lastName.style.border = '2px solid green';
     validLastName = true;
   } else if (charAlphaRegExp.test(lastName.value) === false||lastName.value === '') {
@@ -379,7 +381,7 @@ function checkLastName() {
 
 function checkAddress() {
   if (addressRegExp.test(address.value)) {
-    addressErrorMag.innerHTML = null;
+    addressErrorMsg.innerHTML = null;
     address.style.border = '2px solid green';
     validAddress = true;
   } else if (addressRegExp.test(address.value) === false||address.value === '') {
@@ -391,7 +393,7 @@ function checkAddress() {
 
 function checkCity() {
   if (charAlphaRegExp.test(city.value)) {
-    cityErrorMag.innerHTML = null;
+    cityErrorMsg.innerHTML = null;
     city.style.border = '2px solid green';
     validCity = true;
   } else if (charAlphaRegExp.test(city.value) === false||city.value === '') {
@@ -402,16 +404,16 @@ function checkCity() {
 };
 
 function checkEmail() {
-  if (charAlphaRegExp.test(email.value)) {
-    emailErrorMag.innerHTML = null;
+  if (emailRegExp.test(email.value)) {
+    emailErrorMsg.innerHTML = null;
     email.style.border = '2px solid green';
     validEmail = true;
-  } else if (charAlphaRegExp.test(email.value) === false||email.value === '') {
+  } else if (emailRegExp.test(email.value) === false||email.value === '') {
     emailErrorMsg.innerHTML = 'Please enter a valid email';
     email.style.border = '2px solid red';
     validEmail = false;
   }
-};
+};``
 
 function submitOrder(e) {
   e.preventDefault();
@@ -426,12 +428,14 @@ function submitOrder(e) {
     return response.json();
   }).then(function (data) {
     console.log(data);
-    pageRedirect(data);
+    // pageRedirect(data);
   }).catch(function (error) {
     console.log(error);
   })
 };
+
 console.log(order);
+
 function pageRedirect(data) {
   const newPage = './confirmation.html?id=' + data.orderId;
 
