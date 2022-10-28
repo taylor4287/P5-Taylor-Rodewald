@@ -1,11 +1,10 @@
+// making API element
 const dataURL = 'http://localhost:3000/api/products/';
 
 // fetch is syntactic sugar to make the concept easier to use
 fetch(dataURL)
   .then((response) => response.json()) // implicit return
   .then((data) => {
-    console.log(data);
-
     makeCards(data); // call function, pass in argument
   })
   .then()
@@ -14,21 +13,18 @@ fetch(dataURL)
 // function declaration, create parameters
 function makeCards(dataArray) {
   const bucket = document.getElementById('items');
-  console.log(bucket);
 
   for (let i=0; i<dataArray.length; i++) {
     const card = makeCard(dataArray[i]);
-
     bucket.appendChild(card);
   }
 }
 
+// function to make product cars
 function makeCard(dataObj) {
   // create the elements
   const card = document.createElement('a');
-  
   const article = document.createElement('article');
-
   const image = document.createElement('img');
   const name = document.createElement('h3');
   const description = document.createElement('p');
@@ -43,7 +39,7 @@ function makeCard(dataObj) {
   card.setAttribute("href", cardLink);
   image.setAttribute('src',dataObj.imageUrl);
   image.setAttribute('alt',dataObj.altTxt);
-  console.log(cardLink);
+
 // add classes to elements
   name.classList.add('productName');
   description.classList.add('productDescription');
@@ -52,7 +48,6 @@ function makeCard(dataObj) {
   article.appendChild(image);
   article.appendChild(name);
   article.appendChild(description);
-
   card.appendChild(article);
 
   return card;

@@ -1,12 +1,9 @@
 // get id from search params - URL
 const params = new URLSearchParams(window.location.search);
-// console.log(params);
 
 const _id = params.get('id');
-// console.log(id);
 
 const productItem = 'http://localhost:3000/api/products/' + _id;
-console.log(productItem)
 
 // object for specific product
 const cartItem = {
@@ -22,24 +19,21 @@ const cartItem = {
 // Cart Array from local storage
 let cartJSON = localStorage.getItem('cart') || '[]';
 let cart = JSON.parse(cartJSON);
-// console.log(cart);
 
 // Fetching the item
 fetch(productItem)
   .then((response) => response.json()) // implicit return
   .then((data) => {
-    console.log(data);
-
     makeProduct(data); // call function, pass in argument
     initProdItem(data);
   })
   .then()
   .catch((error) => console.log(error));
 
+// function to initialize the product items
 function initProdItem(dataCard) {
   cartItem._id = dataCard._id;
   cartItem.name = dataCard.name;
-  // cartItem.price = dataCard.price;
   cartItem.description = dataCard.description;
   cartItem.color = dataCard.colors;
   cartItem.imageUrl = dataCard.imageUrl;
@@ -51,22 +45,20 @@ function makeProduct(dataCard) {
 
   // handle image
   const imageDiv = document.getElementsByClassName('item__img')[0];
-    // console.log(imageDiv);
   const itemImg = document.createElement('img');
   itemImg.setAttribute('src', dataCard.imageUrl);
   itemImg.setAttribute('alt', dataCard.altTxt);
-  // console.log(itemImg);
   imageDiv.appendChild(itemImg);
 
   // add title content
   const title = document.getElementById('title');
   title.innerText = dataCard.name;
 
-    // add price content
+  // add price content
   const price = document.getElementById('price');
   price.innerText = dataCard.price / 100;
 
-    // add description content
+  // add description content
   const description = document.getElementById('description');
   description.innerText = dataCard.description;
 
@@ -76,12 +68,12 @@ function makeProduct(dataCard) {
 
   const productQuantity = document.getElementById('quantity');
   productQuantity.addEventListener('change', quantityUpdated);
-  // console.log(productQuantity);
 
   // create option tags for the pulldown menu
   addPulldown(dataCard.colors)
 };
 
+// handle the drop-down menu
 function addPulldown(colors) {
   // add color options
   const colorOptions = document.getElementById('colors');
@@ -96,7 +88,6 @@ function addPulldown(colors) {
     const option = document.createElement('option');
 
     // add value attributes
-    // console.log(colors[i]);
     option.value = colors[i];
     option.innerText = colors[i];
 
@@ -105,18 +96,18 @@ function addPulldown(colors) {
   };
 }
 
+// listener function for drop-down menu
 function handlePullDown(e) {
   const input = e.target;
   const value = input.value;
   cartItem.color = value;
-  console.log(value);
 }
 
+// listener function for quantity selector
 function quantityUpdated(number) {
   const input = number.target;
   const value = input.value;
   cartItem.qty = value;
-  console.log(value);
 }
 
 // add to cart function
@@ -140,7 +131,6 @@ function addToCartClicked(event) {
     if (cartItem.name === cart[i].name &&
       cartItem.color === cart[i].color) {
         addedToCart = false;
-        // cartItem.qty++;
         cart[i].qty = cartItem.qty;
       }
     }
@@ -148,13 +138,10 @@ function addToCartClicked(event) {
   if (addedToCart) {
     cart.push(cartItem);
   }
-  
-  console.log('clicked');
-  console.log(cart);
-  
   syncCart();
 }
 
+// function to sync cart and localStorage
 function syncCart () {
   localStorage.setItem('cart', JSON.stringify(cart));
   cart = JSON.parse(localStorage.getItem('cart'));
